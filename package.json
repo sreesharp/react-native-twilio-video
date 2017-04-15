@@ -1,0 +1,17 @@
+
+{
+  "name": "react-native-twilio-video",
+  "version": "0.0.1",
+  "description": "",
+  "main": "./js/index.js",
+  "scripts": {
+  },
+  "keywords": [
+    "react-native"
+  ],
+  "author": "Sreejumon Purayil",
+  "license": "MIT",
+  "peerDependencies": {
+    "react-native": "^0.41.2",
+  },
+}
