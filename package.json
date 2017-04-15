@@ -1,4 +1,3 @@
-
 {
   "name": "react-native-twilio-video",
   "version": "0.0.1",
@@ -12,6 +11,6 @@
   "author": "Sreejumon Purayil",
   "license": "MIT",
   "peerDependencies": {
-    "react-native": "^0.41.2",
+    "react-native": "^0.41.2"
   }
 }
