@@ -19,4 +19,19 @@ public class RNTwilioVideoModule extends ReactContextBaseJavaModule {
   public String getName() {
     return "RNTwilioVideo";
   }
+
+  @ReactMethod
+  public void startCall(String accessToken, String roomName) {
+    AlertDialog alertDialog = new AlertDialog.Builder(reactContext).create();
+    alertDialog.setTitle("Alert");
+    alertDialog.setMessage("Alert message to be shown");
+    alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "OK",
+        new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+            }
+        });
+    alertDialog.show();
+  }
+
 }

@@ -7,6 +7,8 @@
 'use strict';
 
 exports.Video = require('./Video');
+
+/*
 exports.Room = require('./Room');
 exports.LocalMedia = require('./LocalMedia');
 exports.AudioTrack = require('./AudioTrack');
@@ -16,5 +18,8 @@ exports.VideoCapturer = require('./VideoCapturer');
 exports.VideoView = require('./VideoView');
 exports.VideoConstraints = require('./VideoConstraints');
 
+*/
+
+// exports.ConnectOptions = require(./ConnectOptions)
 //ScreenCapturer
 //MediaProjectionManager
