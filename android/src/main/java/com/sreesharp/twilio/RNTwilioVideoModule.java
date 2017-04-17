@@ -1,50 +1,33 @@
 
 package com.sreesharp.twilio;
 
-import android.widget.Toast;
+import android.support.annotation.Nullable;
 
+import com.facebook.react.bridge.Arguments;
+import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
-import com.facebook.react.bridge.Callback;
-
-import com.facebook.react.bridge.NativeModule;
-import com.facebook.react.bridge.ReactApplicationContext;
-import com.facebook.react.bridge.ReactContext;
-
-import java.util.Map;
-import java.util.HashMap;
-
-import com.google.gson.JsonObject;
-import com.koushikdutta.async.future.FutureCallback;
-import com.koushikdutta.ion.Ion;
-import com.twilio.video.RoomState;
-import com.twilio.video.Video;
-import com.twilio.video.VideoRenderer;
-import com.twilio.video.TwilioException;
-import com.twilio.video.AudioTrack;
-import com.twilio.video.CameraCapturer;
+import com.facebook.react.bridge.WritableMap;
+import com.facebook.react.modules.core.DeviceEventManagerModule;
 import com.twilio.video.CameraCapturer.CameraSource;
 import com.twilio.video.ConnectOptions;
-import com.twilio.video.LocalAudioTrack;
-import com.twilio.video.LocalMedia;
-import com.twilio.video.LocalVideoTrack;
-import com.twilio.video.Media;
 import com.twilio.video.Participant;
 import com.twilio.video.Room;
+import com.twilio.video.TwilioException;
+import com.twilio.video.Video;
 import com.twilio.video.VideoTrack;
 import com.twilio.video.VideoView;
+
+import java.util.HashMap;
+import java.util.Map;
 
 
 public class RNTwilioVideoModule extends ReactContextBaseJavaModule {
 
-    private final ReactApplicationContext reactContext;
-    private static final String DURATION_LONG_KEY = "LONG";
-
-    private Room room;
+    private WritableMap params;
 
     public RNTwilioVideoModule(ReactApplicationContext reactContext) {
         super(reactContext);
-        this.reactContext = reactContext;
     }
 
     @Override
@@ -52,22 +35,36 @@ public class RNTwilioVideoModule extends ReactContextBaseJavaModule {
         return "RNTwilioVideo";
     }
 
+    private void sendEvent(String eventName, @Nullable WritableMap params) {
+        getReactApplicationContext()
+                .getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class)
+                .emit(eventName, params);
+    }
+
     @Override
     public Map<String, Object> getConstants() {
         final Map<String, Object> constants = new HashMap<>();
-        constants.put(DURATION_LONG_KEY, Toast.LENGTH_LONG);
         return constants;
     }
 
     @ReactMethod
-    public void startCall(String accessToken, String roomName) {
+    public void connect(String accessToken, String roomName) {
         ConnectOptions connectOptions = new ConnectOptions.Builder(accessToken)
             .roomName(roomName)
             .localMedia(Utility.getLocalMedia())
             .build();
-        room = Video.connect(getReactApplicationContext(), connectOptions, roomListener());
-        Utility.addRoom(roomName, room);
+        Room room = Video.connect(getReactApplicationContext(), connectOptions, roomListener());
+        if(room != null)
+            Utility.addRoom(roomName, room);
     }
+
+    @ReactMethod
+    public void disconnect(String roomName) {
+        Room room = Utility.getRoom(roomName);
+        if(room != null)
+            room.disconnect();
+    }
+
 
     @ReactMethod
     public void switchCamera() {
@@ -83,16 +80,14 @@ public class RNTwilioVideoModule extends ReactContextBaseJavaModule {
         
         //Add the participants to list
         Utility.addParticipant(participant.getIdentity(), participant);
-
-        //TODO: Use this later - refreshParticipantsVideo();
-        refreshParticipantsVideo(participant);
+        refreshParticipantsVideo(participant); //TODO: Use this later - refreshParticipantsVideo();
 
         //TODO: Start listening for participant media events
         // participant.getMedia().setListener(mediaListener());
     }
 
     private void refreshParticipantsVideo( Participant participant) {
-        //TODO: Get all the participants, and connect them to available remote videow views
+        //TODO: Get all the participants, and connect them to available remote video views
         // Currently just using the most recent participant
         // Participant participant = Utility.getParticipant(id);
 
@@ -111,7 +106,9 @@ public class RNTwilioVideoModule extends ReactContextBaseJavaModule {
         return new Room.Listener() {
             @Override
             public void onConnected(Room room) {
-                Toast.makeText(getReactApplicationContext(), "Connected to " + room.getName(), Toast.LENGTH_LONG).show();
+                params = Arguments.createMap();
+                params.putString("roomName", room.getName());
+                sendEvent("onRoomConnected", params);
 
                 for (Map.Entry<String, Participant> entry : room.getParticipants().entrySet()) {
                     addParticipant(entry.getValue());
@@ -121,50 +118,49 @@ public class RNTwilioVideoModule extends ReactContextBaseJavaModule {
 
             @Override
             public void onConnectFailure(Room room, TwilioException e) {
-                Toast.makeText(getReactApplicationContext(), e.getMessage(), Toast.LENGTH_LONG).show();
+                params = Arguments.createMap();
+                params.putString("err",  e.getMessage());
+                sendEvent("onRoomConnectFailure", params);
             }
 
             @Override
             public void onDisconnected(Room room, TwilioException e) {
-                Toast.makeText(getReactApplicationContext(), "Disconnected", Toast.LENGTH_LONG).show();
-                /*
-                videoStatusTextView.setText("Disconnected from " + room.getName());
-                VideoActivity.this.room = null;
-                // Only reinitialize the UI if disconnect was not called from onDestroy()
-                if (!disconnectedFromOnDestroy) {
-                    setAudioFocus(false);
-                    intializeUI();
-                    moveLocalVideoToPrimaryView();
-                } */
+                params = Arguments.createMap();
+                params.putString("err",  e.getMessage());
+                sendEvent("onRoomDisconnected", params);
+
+                //TODO: Notify other VideoViews
             }
 
             @Override
             public void onParticipantConnected(Room room, Participant participant) {
-                Toast.makeText(getReactApplicationContext(), "onParticipantConnected", Toast.LENGTH_LONG).show();
+                params = Arguments.createMap();
+                params.putString("id",  participant.getIdentity());
+                sendEvent("onParticipantConnected", params);
                 addParticipant(participant); 
             }
 
             @Override
             public void onParticipantDisconnected(Room room, Participant participant) {
-                // removeParticipant(participant);
+                params = Arguments.createMap();
+                params.putString("id",  participant.getIdentity());
+                sendEvent("onParticipantDisconnected", params);
+
+                //TODO: removeParticipant(participant);
             }
 
             @Override
             public void onRecordingStarted(Room room) {
-                /*
-                 * Indicates when media shared to a Room is being recorded. Note that
-                 * recording is only available in our Group Rooms developer preview.
-                 */
-                // Log.d(TAG, "onRecordingStarted");
+                params = Arguments.createMap();
+                params.putString("roomName",  room.getName());
+                sendEvent("onRecordingStarted", params);
             }
 
             @Override
             public void onRecordingStopped(Room room) {
-                /*
-                 * Indicates when media shared to a Room is no longer being recorded. Note that
-                 * recording is only available in our Group Rooms developer preview.
-                 */
-                // Log.d(TAG, "onRecordingStopped");
+                params = Arguments.createMap();
+                params.putString("roomName",  room.getName());
+                sendEvent("onRecordingStopped", params);
             }
         };
     }

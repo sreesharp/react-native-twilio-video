@@ -77,19 +77,24 @@ export default class quickstart extends Component {
       modalVisible: false,
       text: 'Room Name',
     };
+    Video.addEventListener('onRoomConnectFailure', this._onRoomConnectFailed);
   }
 
   _setModalVisible(visible) {
     this.setState({modalVisible: visible});
   }
-
+  
   _onConnect() {
     this.setState({modalVisible: false});
     //TODO: Get the access token from server
     const ACCESS_TOKEN = "ACCESS_TOKEN";
-    Video.startCall({roomName: this.state.text, accessToken: ACCESS_TOKEN});
+    Video.connect({roomName: this.state.text, accessToken: ACCESS_TOKEN});
   }
   
+  _onRoomConnectFailed = (msg) => {
+    console.log(msg.err);
+  }
+
   _onCallButtonPress = () => {
     this.setState({modalVisible: true});
   }

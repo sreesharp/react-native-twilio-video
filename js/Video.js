@@ -21,18 +21,10 @@ const _eventHandlers = {
 
 const Video = {
   /**
-   * Start the video call using given token and room name
-   * @Deprecated use connect method
-   */
-  startCall({roomName, accessToken}) {
-    RNTwilioVideo.startCall(accessToken, roomName);
-  },
-
-  /**
    * Connect to given room using given token
    */
   connect({roomName, accessToken}) {
-    RNTwilioVideo.startCall(accessToken, roomName);
+    RNTwilioVideo.connect(accessToken, roomName);
   },
 
   /**
@@ -40,19 +32,12 @@ const Video = {
    */
   disconnect(roomName) {
     console.log('Not yet supported');
-    // RNTwilioVideo.disconnect(roomName);
-    // TODO: internally call the room.disconnect
+    RNTwilioVideo.disconnect(roomName);
   },
 
   /**
-   * Release the room
+   * Set Log level
    */
-  release(roomName) {
-    console.log('Not yet supported');
-    // RNTwilioVideo.releasae(roomName);
-    // TODO: internally call Video.release
-  },
-
   setLogLevel(level) {
     console.log('Not yet supported');
     // RNTwilioVideo.setLogLevel(level);
