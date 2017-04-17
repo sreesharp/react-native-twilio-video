@@ -174,9 +174,9 @@ export default class quickstart extends Component {
           </View>
          </View>
         </Modal>
-        <VideoView isLocal={true} style={styles.fullView}/>
+        <VideoView isLocal={false} style={styles.fullView}/>
         <View style={styles.bottomView}>
-          <VideoView isLocal={false} style={styles.thumbnailView}/>
+          <VideoView isLocal={true} style={styles.thumbnailView}/>
           <View style={styles.controlsView}>
             <View style={styles.bottomView}>
               {this.renderCallButton()}

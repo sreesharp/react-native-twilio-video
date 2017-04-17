@@ -1,7 +1,7 @@
 
 # React Native Twilio Video
 
-React Native Twilio Video Android and iOS
+React Native wrapper for Twilio Video SDK (Android and iOS)
 
 ## Current status
 This component is under active development now. APIs might break in future updates. Please don't use it any production ready app yet.
@@ -11,6 +11,7 @@ You need to install the SDK with `yarn` and configure native Android/iOS project
 
 ### Create React Native project
 First create a React Native project:
+
 `react-native init YourApp`
 
 ### Install JavaScript packages
@@ -59,3 +60,4 @@ _onConnect() {
 
 ```
 ## Quickstart sample in action
+![Video Walkthrough](quickstart.gif)
