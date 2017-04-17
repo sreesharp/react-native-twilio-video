@@ -7,6 +7,7 @@
 'use strict';
 
 exports.Video = require('./Video');
+exports.VideoView = require('./VideoView');
 
 /*
 exports.Room = require('./Room');
