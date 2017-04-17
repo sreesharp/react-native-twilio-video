@@ -30,6 +30,10 @@ const {
     VideoView,
 } = TwilioSDK;
 
+// add listeners
+Video.addEventListener('onRoomConnected', roomConnectedHandler);
+Video.addEventListener('onParticipantConnected', participantConnectedHandler);
+
 ....
 _onConnect() {
     //Get the access token from server
