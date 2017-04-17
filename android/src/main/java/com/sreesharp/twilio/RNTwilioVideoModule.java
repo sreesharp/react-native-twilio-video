@@ -37,47 +37,72 @@ import com.twilio.video.VideoView;
 
 public class RNTwilioVideoModule extends ReactContextBaseJavaModule {
 
-  private final ReactApplicationContext reactContext;
-  private static final String DURATION_LONG_KEY = "LONG";
+    private final ReactApplicationContext reactContext;
+    private static final String DURATION_LONG_KEY = "LONG";
 
-  private Room room;
+    private Room room;
 
-  public RNTwilioVideoModule(ReactApplicationContext reactContext) {
-    super(reactContext);
-    this.reactContext = reactContext;
-  }
+    public RNTwilioVideoModule(ReactApplicationContext reactContext) {
+        super(reactContext);
+        this.reactContext = reactContext;
+    }
 
-  @Override
-  public String getName() {
-    return "RNTwilioVideo";
-  }
+    @Override
+    public String getName() {
+        return "RNTwilioVideo";
+    }
 
-  @Override
-  public Map<String, Object> getConstants() {
-    final Map<String, Object> constants = new HashMap<>();
-    constants.put(DURATION_LONG_KEY, Toast.LENGTH_LONG);
-    return constants;
-  }
+    @Override
+    public Map<String, Object> getConstants() {
+        final Map<String, Object> constants = new HashMap<>();
+        constants.put(DURATION_LONG_KEY, Toast.LENGTH_LONG);
+        return constants;
+    }
 
-  @ReactMethod
-  public void startCall(String accessToken, String roomName) {
-    ConnectOptions connectOptions = new ConnectOptions.Builder(accessToken)
-        .roomName(roomName)
-        .localMedia(Utility.getLocalMedia())
-        .build();
-    room = Video.connect(getReactApplicationContext(), connectOptions, roomListener());
-    Utility.addRoom(roomName, room);
-  }
+    @ReactMethod
+    public void startCall(String accessToken, String roomName) {
+        ConnectOptions connectOptions = new ConnectOptions.Builder(accessToken)
+            .roomName(roomName)
+            .localMedia(Utility.getLocalMedia())
+            .build();
+        room = Video.connect(getReactApplicationContext(), connectOptions, roomListener());
+        Utility.addRoom(roomName, room);
+    }
 
-  @ReactMethod
-  public void switchCamera() {
-    if (Utility.getCameraSource() == CameraSource.FRONT_CAMERA)
-        Utility.setCameraSource(CameraSource.BACK_CAMERA);
-    else
-        Utility.setCameraSource(CameraSource.FRONT_CAMERA);
-    
-    //TODO: Notify all the local VideoView components
-  }
+    @ReactMethod
+    public void switchCamera() {
+        if (Utility.getCameraSource() == CameraSource.FRONT_CAMERA)
+            Utility.setCameraSource(CameraSource.BACK_CAMERA);
+        else
+            Utility.setCameraSource(CameraSource.FRONT_CAMERA);
+        
+        //TODO: Notify all the local VideoView components
+    }
+
+    private void addParticipant(Participant participant) {
+        
+        //Add the participants to list
+        Utility.addParticipant(participant.getIdentity(), participant);
+
+        //TODO: Use this later - refreshParticipantsVideo();
+        refreshParticipantsVideo(participant);
+
+        //TODO: Start listening for participant media events
+        // participant.getMedia().setListener(mediaListener());
+    }
+
+    private void refreshParticipantsVideo( Participant participant) {
+        //TODO: Get all the participants, and connect them to available remote videow views
+        // Currently just using the most recent participant
+        // Participant participant = Utility.getParticipant(id);
+
+        if (participant.getMedia().getVideoTracks().size() > 0) {
+            VideoTrack videoTrack = participant.getMedia().getVideoTracks().get(0);
+            VideoView remoteView = Utility.getRemoteVideoView();
+            remoteView.setMirror(false);
+            videoTrack.addRenderer(remoteView);
+        }
+    }
 
       /*
      * Room events listener
@@ -87,14 +112,11 @@ public class RNTwilioVideoModule extends ReactContextBaseJavaModule {
             @Override
             public void onConnected(Room room) {
                 Toast.makeText(getReactApplicationContext(), "Connected to " + room.getName(), Toast.LENGTH_LONG).show();
-                /*
-                videoStatusTextView.setText("Connected to " + room.getName());
-                setTitle(room.getName());
 
                 for (Map.Entry<String, Participant> entry : room.getParticipants().entrySet()) {
                     addParticipant(entry.getValue());
                     break;
-                } */
+                } 
             }
 
             @Override
@@ -118,11 +140,8 @@ public class RNTwilioVideoModule extends ReactContextBaseJavaModule {
 
             @Override
             public void onParticipantConnected(Room room, Participant participant) {
-              Toast.makeText(getReactApplicationContext(), "onParticipantConnected", Toast.LENGTH_LONG).show();
-              /*
+                Toast.makeText(getReactApplicationContext(), "onParticipantConnected", Toast.LENGTH_LONG).show();
                 addParticipant(participant); 
-                */
-
             }
 
             @Override

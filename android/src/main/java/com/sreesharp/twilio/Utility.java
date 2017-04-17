@@ -25,8 +25,12 @@ import com.twilio.video.VideoView;
 
 public final class Utility {
     private static HashMap<String, Room> roomMap = new HashMap<String, Room>();
+    private static HashMap<String, Participant> participantMap = new HashMap<String, Participant>();
     private static LocalMedia localMedia;
     private static CameraSource cameraSource = CameraSource.FRONT_CAMERA;
+    // TODO: Currently supporting only one remote participant
+    // private static HashMap<String, VideoView> remoteViewMap = new HashMap<String, VideoView>();
+    private static VideoView remoteView;
 
     public static Room getRoom(String roomName) {
         if (roomMap.containsKey(roomName))
@@ -55,6 +59,31 @@ public final class Utility {
 
     public static CameraSource getCameraSource() {
         return cameraSource;
+    }
+
+    public static Participant getParticipant(String participantId) {
+        if (participantMap.containsKey(participantId))
+            return (Participant)participantMap.get(participantId);
+        else
+            return null;
+    }
+    
+    public static void addParticipant(String participantId, Participant participant) {
+        participantMap.put(participantId, participant);
+    }
+    
+    public static void removeParticipant(String participantId) {
+        if(participantMap.containsKey(participantId))
+            participantMap.remove(participantId);
+    }
+
+    //TODO: Currently supporting only one remote participant, hence not using the remoteViewMap
+    public static void setRemoteVideoView(VideoView view) {
+        remoteView = view;
+    }
+
+    public static VideoView getRemoteVideoView() {
+        return remoteView;
     }
 
 }

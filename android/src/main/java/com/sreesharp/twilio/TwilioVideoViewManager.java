@@ -66,7 +66,7 @@ public class TwilioVideoViewManager extends SimpleViewManager<VideoView> {
         Log.d(TAG, ex.getMessage());
       }
     } else { //Remote video
-
+      Utility.setRemoteVideoView(videoView);
     }
   }
 }
