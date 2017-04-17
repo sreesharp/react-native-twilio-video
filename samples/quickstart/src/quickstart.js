@@ -87,7 +87,7 @@ export default class quickstart extends Component {
     this.setState({modalVisible: false});
     //TODO: Get the access token from server
     const ACCESS_TOKEN = "ACCESS_TOKEN";
-    Video.startCall({roomName: "Sreesharp", accessToken: ACCESS_TOKEN});
+    Video.startCall({roomName: this.state.text, accessToken: ACCESS_TOKEN});
   }
   
   _onCallButtonPress = () => {
