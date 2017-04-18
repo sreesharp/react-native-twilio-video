@@ -31,7 +31,6 @@ const Video = {
    * Disconnect from the room
    */
   disconnect(roomName) {
-    console.log('Not yet supported');
     RNTwilioVideo.disconnect(roomName);
   },
 
